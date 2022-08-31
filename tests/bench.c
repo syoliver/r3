@@ -13,7 +13,7 @@
 
 #include "r3.h"
 #include "r3_str.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 #include "bench.h"
 
 

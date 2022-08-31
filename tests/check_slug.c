@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include "r3.h"
 #include "r3_str.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 #include "slug.h"
 
 START_TEST (test_pattern_to_opcode)
@@ -27,19 +27,19 @@ START_TEST (test_r3_slug_compile)
     char * path = "/user/{id}";
     char * c = NULL;
     ck_assert_str_eq( c = r3_slug_compile(path, strlen(path) ) , "^/user/([^/]+)" );
-    zfree(c);
+    z_free(c);
 
     char * path2 = "/what/{id}-foo";
     ck_assert_str_eq( c = r3_slug_compile(path2, strlen(path2) ) , "^/what/([^/]+)-foo" );
-    zfree(c);
+    z_free(c);
 
     char * path3 = "-{id}";
     ck_assert_str_eq( c = r3_slug_compile(path3, strlen(path3)), "^-([^/]+)" );
-    zfree(c);
+    z_free(c);
 
     char * path4 = "-{idx:\\d{3}}";
     ck_assert_str_eq( c = r3_slug_compile(path4, strlen(path4)), "^-(\\d{3})" );
-    zfree(c);
+    z_free(c);
 }
 END_TEST
 

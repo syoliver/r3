@@ -12,7 +12,7 @@
 #include "r3.h"
 #include "r3_str.h"
 #include "slug.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 
 int r3_pattern_to_opcode(const char * pattern, int len) {
     if ( strncmp(pattern, "\\w+",len) == 0 ) {
@@ -182,11 +182,11 @@ char * r3_slug_compile(const char * str, int len)
     s1 = r3_slug_find_placeholder(str, &s1_len);
 
     if ( s1 == NULL ) {
-        return zstrdup(str);
+        return z_strdup(str);
     }
 
     char * out = NULL;
-    if ((out = zcalloc(sizeof(char) * 200)) == NULL) {
+    if ((out = z_calloc(sizeof(char) * 200)) == NULL) {
         return (NULL);
     }
 
@@ -222,7 +222,7 @@ char * ltrim_slash(char* str)
 {
     char * p = str;
     while (*p == '/') p++;
-    return zstrdup(p);
+    return z_strdup(p);
 }
 
 void str_repeat(char *s, const char *c, int len) {
@@ -241,13 +241,13 @@ void print_indent(int level) {
 
 
 #ifndef HAVE_STRDUP
-char *zstrdup(const char *s) {
+char *z_strdup(const char *s) {
     char *out;
     int count = 0;
     while( s[count] )
         ++count;
     ++count;
-    out = zmalloc(sizeof(char) * count);
+    out = z_malloc(sizeof(char) * count);
     out[--count] = 0;
     while( --count >= 0 )
         out[count] = s[count];
@@ -258,13 +258,13 @@ char *zstrdup(const char *s) {
 
 
 #ifndef HAVE_STRNDUP
-char *zstrndup(const char *s, int n) {
+char *z_strndup(const char *s, int n) {
     char *out;
     int count = 0;
     while( count < n && s[count] )
         ++count;
     ++count;
-    out = zmalloc(sizeof(char) * count);
+    out = z_malloc(sizeof(char) * count);
     out[--count] = 0;
     while( --count >= 0 )
         out[count] = s[count];

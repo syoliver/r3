@@ -11,7 +11,7 @@
 #include "r3.h"
 #include "r3_str.h"
 #include "slug.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 
 
 #define CHECK_PTR(ptr) if (ptr == NULL) return NULL;
@@ -44,10 +44,10 @@ static int strdiff(char * d1, char * d2) {
  * Create a node object
  */
 node * r3_tree_create(int cap) {
-    node * n = (node*) zmalloc( sizeof(node) );
+    node * n = (node*) z_malloc( sizeof(node) );
     CHECK_PTR(n);
 
-    n->edges = (edge**) zmalloc( sizeof(edge*) * cap );
+    n->edges = (edge**) z_malloc( sizeof(edge*) * cap );
     CHECK_PTR(n->edges);
     n->edge_len = 0;
     n->edge_cap = cap;
@@ -70,8 +70,8 @@ void r3_tree_free(node * tree) {
             r3_edge_free(tree->edges[ i ]);
         }
     }
-    zfree(tree->edges);
-    zfree(tree->routes);
+    z_free(tree->edges);
+    z_free(tree->routes);
     if (tree->pcre_pattern) {
         pcre_free(tree->pcre_pattern);
     }
@@ -80,8 +80,8 @@ void r3_tree_free(node * tree) {
         pcre_free_study(tree->pcre_extra);
     }
 #endif
-    zfree(tree->combined_pattern);
-    zfree(tree);
+    z_free(tree->combined_pattern);
+    z_free(tree);
     tree = NULL;
 }
 
@@ -100,7 +100,7 @@ edge * r3_node_connectl(node * n, const char * pat, int len, int dupl, node *chi
     }
 
     if (dupl) {
-        pat = zstrndup(pat, len);
+        pat = z_strndup(pat, len);
     }
     e = r3_edge_createl(pat, len, child);
     CHECK_PTR(e);
@@ -111,11 +111,11 @@ edge * r3_node_connectl(node * n, const char * pat, int len, int dupl, node *chi
 void r3_node_append_edge(node *n, edge *e) {
     if (n->edges == NULL) {
         n->edge_cap = 3;
-        n->edges = zmalloc(sizeof(edge) * n->edge_cap);
+        n->edges = z_malloc(sizeof(edge) * n->edge_cap);
     }
     if (n->edge_len >= n->edge_cap) {
         n->edge_cap *= 2;
-        edge ** p = zrealloc(n->edges, sizeof(edge) * n->edge_cap);
+        edge ** p = z_realloc(n->edges, sizeof(edge) * n->edge_cap);
         if(p) {
             n->edges = p;
         }
@@ -175,7 +175,7 @@ int r3_tree_compile(node *n, char **errstr)
 int r3_tree_compile_patterns(node * n, char **errstr) {
     edge * e = NULL;
     char * p;
-    char * cpat = zcalloc(sizeof(char) * 64 * 3); // XXX
+    char * cpat = z_calloc(sizeof(char) * 64 * 3); // XXX
     if (!cpat) {
         asprintf(errstr, "Can not allocate memory");
         return -1;
@@ -213,7 +213,7 @@ int r3_tree_compile_patterns(node * n, char **errstr) {
 
     // if all edges use opcode, we should skip the combined_pattern.
     if ( opcode_cnt == n->edge_len ) {
-        // zfree(cpat);
+        // z_free(cpat);
         n->compare_type = NODE_COMPARE_OPCODE;
     } else {
         n->compare_type = NODE_COMPARE_PCRE;
@@ -307,7 +307,7 @@ node * r3_tree_matchl(const node * n, const char * path, int path_len, match_ent
             // check match
             if ( (pp - path) > 0) {
                 if (entry) {
-                    str_array_append(entry->vars , zstrndup(path, pp - path));
+                    str_array_append(entry->vars , z_strndup(path, pp - path));
                 }
                 restlen = pp_end - pp;
                 if (restlen == 0) {
@@ -376,7 +376,7 @@ node * r3_tree_matchl(const node * n, const char * path, int path_len, match_ent
 
                 if (entry && e->has_slug) {
                     // append captured token to entry
-                    str_array_append(entry->vars , zstrndup(substring_start, substring_length));
+                    str_array_append(entry->vars , z_strndup(substring_start, substring_length));
                 }
 
                 // since restlen == 0 return the edge quickly.
@@ -400,7 +400,7 @@ node * r3_tree_matchl(const node * n, const char * path, int path_len, match_ent
 
             if (entry && e->has_slug) {
                 // append captured token to entry
-                str_array_append(entry->vars , zstrndup(substring_start, substring_length));
+                str_array_append(entry->vars , z_strndup(substring_start, substring_length));
             }
 
             // get the length of orginal string: $0
@@ -452,7 +452,7 @@ inline edge * r3_node_find_edge_str(const node * n, const char * str, int str_le
 }
 
 node * r3_node_create() {
-    node * n = (node*) zmalloc( sizeof(node) );
+    node * n = (node*) z_malloc( sizeof(node) );
     CHECK_PTR(n);
     n->edges = NULL;
     n->edge_len = 0;
@@ -471,11 +471,11 @@ node * r3_node_create() {
 }
 
 void r3_route_free(route * route) {
-    zfree(route);
+    z_free(route);
 }
 
 route * r3_route_createl(const char * path, int path_len) {
-    route * info = zmalloc(sizeof(route));
+    route * info = z_malloc(sizeof(route));
     CHECK_PTR(info);
     info->path = (char*) path;
     info->path_len = path_len;
@@ -647,7 +647,7 @@ node * r3_tree_insert_pathl_ex(node *tree, const char *path, int path_len, route
             node * child = r3_tree_create(3);
             CHECK_PTR(child);
 
-            r3_node_connect(n, zstrndup(path, (int)(p - path)), child);
+            r3_node_connect(n, z_strndup(path, (int)(p - path)), child);
 
             // and insert the rest part to the child
             return r3_tree_insert_pathl_ex(child, p, path_len - (int)(p - path),  route, data, errstr);
@@ -665,7 +665,7 @@ node * r3_tree_insert_pathl_ex(node *tree, const char *path, int path_len, route
                 if (slug_pattern_len) {
                     char *cpattern = r3_slug_compile(slug_pattern, slug_pattern_len);
                     opcode = r3_pattern_to_opcode(cpattern, strlen(cpattern));
-                    zfree(cpattern);
+                    z_free(cpattern);
                 } else {
                     opcode = OP_EXPECT_NOSLASH;
                 }
@@ -845,11 +845,11 @@ inline int r3_route_cmp(const route *r1, const match_entry *r2) {
 void r3_node_append_route(node * n, route * r) {
     if (n->routes == NULL) {
         n->route_cap = 3;
-        n->routes = zmalloc(sizeof(route) * n->route_cap);
+        n->routes = z_malloc(sizeof(route) * n->route_cap);
     }
     if (n->route_len >= n->route_cap) {
         n->route_cap *= 2;
-        n->routes = zrealloc(n->routes, sizeof(route) * n->route_cap);
+        n->routes = z_realloc(n->routes, sizeof(route) * n->route_cap);
     }
     n->routes[ n->route_len++ ] = r;
 }

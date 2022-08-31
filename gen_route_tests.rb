@@ -11,7 +11,7 @@ puts <<END
 #include <assert.h>
 #include "r3.h"
 #include "r3_str.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 
 START_TEST (test_routes)
 {

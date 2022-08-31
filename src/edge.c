@@ -18,14 +18,14 @@
 #include "r3.h"
 #include "r3_str.h"
 #include "slug.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 
 
 #define CHECK_PTR(ptr) if (ptr == NULL) return NULL;
 
 
 edge * r3_edge_createl(const char * pattern, int pattern_len, node * child) {
-    edge * e = (edge*) zmalloc( sizeof(edge) );
+    edge * e = (edge*) z_malloc( sizeof(edge) );
 
     CHECK_PTR(e);
 
@@ -60,7 +60,7 @@ node * r3_edge_branch(edge *e, int dl) {
 
     // the suffix edge of the leaf
     new_child = r3_tree_create(3);
-    new_edge = r3_edge_createl(zstrndup(s1, s1_len), s1_len, new_child);
+    new_edge = r3_edge_createl(z_strndup(s1, s1_len), s1_len, new_child);
 
     // Move child node to the new edge
     new_edge->child = e->child;
@@ -70,18 +70,18 @@ node * r3_edge_branch(edge *e, int dl) {
 
     // truncate the original edge pattern
     char *oldpattern = e->pattern;
-    e->pattern = zstrndup(e->pattern, dl);
+    e->pattern = z_strndup(e->pattern, dl);
     e->pattern_len = dl;
-    zfree(oldpattern);
+    z_free(oldpattern);
     return new_child;
 }
 
 void r3_edge_free(edge * e) {
-    zfree(e->pattern);
+    z_free(e->pattern);
     if ( e->child ) {
         r3_tree_free(e->child);
     }
     // free itself
-    zfree(e);
+    z_free(e);
 }
 

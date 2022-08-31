@@ -1,7 +1,7 @@
 #ifndef ZMALLOC_H
 #define ZMALLOC_H
 
-/* zmalloc - total amount of allocated memory aware version of malloc()
+/* z_malloc - total amount of allocated memory aware version of malloc()
  *
  * Copyright (c) 2009-2010, Salvatore Sanfilippo <antirez at gmail dot com>
  * All rights reserved.
@@ -36,51 +36,51 @@
 #define __str(s) #s
 
 #if defined(USE_TCMALLOC)
-#define ZMALLOC_LIB ("tcmalloc-" __xstr(TC_VERSION_MAJOR) "." __xstr(TC_VERSION_MINOR))
-#include <google/tcmalloc.h>
-#if (TC_VERSION_MAJOR == 1 && TC_VERSION_MINOR >= 6) || (TC_VERSION_MAJOR > 1)
-#define HAVE_MALLOC_SIZE 1
-#define zmalloc_size(p) tc_malloc_size(p)
-#else
-#error "Newer version of tcmalloc required"
-#endif
+#   define ZMALLOC_LIB ("tcmalloc-" __xstr(TC_VERSION_MAJOR) "." __xstr(TC_VERSION_MINOR))
+#   include <google/tcmalloc.h>
+#   if (TC_VERSION_MAJOR == 1 && TC_VERSION_MINOR >= 6) || (TC_VERSION_MAJOR > 1)
+#       define HAVE_MALLOC_SIZE 1
+#       define z_malloc_size(p) tc_malloc_size(p)
+#   else
+#       error "Newer version of tcmalloc required"
+#   endif
 
 #elif defined(USE_JEMALLOC) && (JEMALLOC_VERSION_MAJOR > 2)
-#define ZMALLOC_LIB ("jemalloc-" __xstr(JEMALLOC_VERSION_MAJOR) "." __xstr(JEMALLOC_VERSION_MINOR) "." __xstr(JEMALLOC_VERSION_BUGFIX))
-#include <jemalloc/jemalloc.h>
-#if (JEMALLOC_VERSION_MAJOR == 2 && JEMALLOC_VERSION_MINOR >= 1) || (JEMALLOC_VERSION_MAJOR > 2)
-#define HAVE_MALLOC_SIZE 1
-#define zmalloc_size(p) je_malloc_usable_size(p)
-#else
-#error "Newer version of jemalloc required"
-#endif
+#   define ZMALLOC_LIB ("jemalloc-" __xstr(JEMALLOC_VERSION_MAJOR) "." __xstr(JEMALLOC_VERSION_MINOR) "." __xstr(JEMALLOC_VERSION_BUGFIX))
+#   include <jemalloc/jemalloc.h>
+#   if (JEMALLOC_VERSION_MAJOR == 2 && JEMALLOC_VERSION_MINOR >= 1) || (JEMALLOC_VERSION_MAJOR > 2)
+#       define HAVE_MALLOC_SIZE 1
+#       define z_malloc_size(p) je_malloc_usable_size(p)
+#   else
+#       error "Newer version of jemalloc required"
+#   endif
 
 #elif defined(__APPLE__)
-#include <malloc/malloc.h>
-#define HAVE_MALLOC_SIZE 1
-#define zmalloc_size(p) malloc_size(p)
+#   include <malloc/malloc.h>
+#   define HAVE_MALLOC_SIZE 1
+#   define z_malloc_size(p) malloc_size(p)
 #endif
 
 #ifndef ZMALLOC_LIB
 #define ZMALLOC_LIB "libc"
 #endif
 
-void *zmalloc(size_t size);
-void *zcalloc(size_t size);
-void *zrealloc(void *ptr, size_t size);
-void zfree(void *ptr);
-char *zstrdup(const char *s);
-char *zstrndup(const char *s, size_t n);
-size_t zmalloc_used_memory(void);
-void zmalloc_enable_thread_safeness(void);
-void zmalloc_set_oom_handler(void (*oom_handler)(size_t));
-float zmalloc_get_fragmentation_ratio(size_t rss);
-size_t zmalloc_get_rss(void);
-size_t zmalloc_get_private_dirty(void);
-void zlibc_free(void *ptr);
+void *z_malloc(size_t size);
+void *z_calloc(size_t size);
+void *z_realloc(void *ptr, size_t size);
+void z_free(void *ptr);
+char *z_strdup(const char *s);
+char *z_strndup(const char *s, size_t n);
+size_t z_malloc_used_memory(void);
+void z_malloc_enable_thread_safeness(void);
+void z_malloc_set_oom_handler(void (*oom_handler)(size_t));
+float z_malloc_get_fragmentation_ratio(size_t rss);
+size_t z_malloc_get_rss(void);
+size_t z_malloc_get_private_dirty(void);
+void z_libc_free(void *ptr);
 
 #ifndef HAVE_MALLOC_SIZE
-size_t zmalloc_size(void *ptr);
+size_t z_malloc_size(void *ptr);
 #endif
 
 #endif // ZMALLOC_H

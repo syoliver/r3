@@ -5,7 +5,7 @@
 #include <assert.h>
 #include "r3.h"
 #include "r3_str.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 #include "bench.h"
 
 #define SAFE_FREE(ptr) if(ptr) free(ptr);
@@ -15,7 +15,7 @@
 START_TEST (test_find_common_prefix)
 {
     node * n = r3_tree_create(10);
-    edge * e = r3_edge_createl(zstrdup("/foo/{slug}"), sizeof("/foo/{slug}")-1, NULL);
+    edge * e = r3_edge_createl(z_strdup("/foo/{slug}"), sizeof("/foo/{slug}")-1, NULL);
     r3_node_append_edge(n,e);
 
     char *errstr = NULL;
@@ -84,7 +84,7 @@ END_TEST
 START_TEST (test_find_common_prefix_after)
 {
     node * n = r3_tree_create(10);
-    edge * e = r3_edge_createl(zstrdup("{slug}/foo"), sizeof("{slug}/foo")-1, NULL);
+    edge * e = r3_edge_createl(z_strdup("{slug}/foo"), sizeof("{slug}/foo")-1, NULL);
     r3_node_append_edge(n,e);
 
     int prefix_len = 0;
@@ -121,7 +121,7 @@ END_TEST
 START_TEST (test_find_common_prefix_double_middle)
 {
     node * n = r3_tree_create(10);
-    edge * e = r3_edge_createl(zstrdup("{slug}/foo/{name}"), sizeof("{slug}/foo/{name}")-1, NULL);
+    edge * e = r3_edge_createl(z_strdup("{slug}/foo/{name}"), sizeof("{slug}/foo/{name}")-1, NULL);
     r3_node_append_edge(n,e);
 
     int prefix_len;
@@ -143,7 +143,7 @@ END_TEST
 START_TEST (test_find_common_prefix_middle)
 {
     node * n = r3_tree_create(10);
-    edge * e = r3_edge_createl(zstrdup("/foo/{slug}/hate"), sizeof("/foo/{slug}/hate")-1, NULL);
+    edge * e = r3_edge_createl(z_strdup("/foo/{slug}/hate"), sizeof("/foo/{slug}/hate")-1, NULL);
     r3_node_append_edge(n,e);
 
     int prefix_len;
@@ -169,7 +169,7 @@ END_TEST
 START_TEST (test_find_common_prefix_same_pattern)
 {
     node * n = r3_tree_create(10);
-    edge * e = r3_edge_createl(zstrdup("/foo/{slug:xxx}/hate"), sizeof("/foo/{slug:xxx}/hate")-1, NULL);
+    edge * e = r3_edge_createl(z_strdup("/foo/{slug:xxx}/hate"), sizeof("/foo/{slug:xxx}/hate")-1, NULL);
     r3_node_append_edge(n,e);
 
     int prefix_len;
@@ -193,7 +193,7 @@ END_TEST
 START_TEST (test_find_common_prefix_same_pattern2)
 {
     node * n = r3_tree_create(10);
-    edge * e = r3_edge_createl(zstrdup("{slug:xxx}/hate"), sizeof("{slug:xxx}/hate")-1, NULL);
+    edge * e = r3_edge_createl(z_strdup("{slug:xxx}/hate"), sizeof("{slug:xxx}/hate")-1, NULL);
     r3_node_append_edge(n,e);
 
     int prefix_len;

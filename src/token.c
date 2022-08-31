@@ -11,15 +11,15 @@
 #include "r3.h"
 #include "r3_str.h"
 #include "str_array.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 
 str_array * str_array_create(int cap) {
-    str_array * list = (str_array*) zmalloc( sizeof(str_array) );
+    str_array * list = (str_array*) z_malloc( sizeof(str_array) );
     if (!list)
         return NULL;
     list->len = 0;
     list->cap = cap;
-    list->tokens = (char**) zmalloc( sizeof(char*) * cap);
+    list->tokens = (char**) z_malloc( sizeof(char*) * cap);
     return list;
 }
 
@@ -27,11 +27,11 @@ void str_array_free(str_array *l) {
     assert(l);
     for ( int i = 0; i < l->len ; i++ ) {
         if (l->tokens[ i ]) {
-            zfree(l->tokens[i]);
+            z_free(l->tokens[i]);
         }
     }
-    zfree(l->tokens);
-    zfree(l);
+    z_free(l->tokens);
+    z_free(l);
 }
 
 bool str_array_is_full(const str_array * l) {
@@ -39,7 +39,7 @@ bool str_array_is_full(const str_array * l) {
 }
 
 bool str_array_resize(str_array * l, int new_cap) {
-    l->tokens = zrealloc(l->tokens, sizeof(char**) * new_cap);
+    l->tokens = z_realloc(l->tokens, sizeof(char**) * new_cap);
     l->cap = new_cap;
     return l->tokens != NULL;
 }

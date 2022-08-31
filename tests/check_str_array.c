@@ -10,23 +10,23 @@
 #include <check.h>
 #include "r3.h"
 #include "r3_str.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 
 START_TEST (test_str_array)
 {
     str_array * l = str_array_create(3);
     ck_assert(l);
 
-    ck_assert(str_array_append(l, zstrdup("abc")));
+    ck_assert(str_array_append(l, z_strdup("abc")));
     ck_assert( l->len == 1 );
 
-    ck_assert(str_array_append(l, zstrdup("foo") ));
+    ck_assert(str_array_append(l, z_strdup("foo") ));
     ck_assert( l->len == 2 );
 
-    ck_assert( str_array_append(l, zstrdup("bar") ) );
+    ck_assert( str_array_append(l, z_strdup("bar") ) );
     ck_assert( l->len == 3 );
 
-    ck_assert( str_array_append(l, zstrdup("zoo") ) );
+    ck_assert( str_array_append(l, z_strdup("zoo") ) );
     ck_assert( l->len == 4 );
 
     ck_assert( str_array_resize(l, l->cap * 2) );

@@ -12,10 +12,10 @@
 #include <stdbool.h>
 
 #include "r3.h"
-#include "zmalloc.h"
+#include "z_malloc.h"
 
 match_entry * match_entry_createl(const char * path, int path_len) {
-    match_entry * entry = zmalloc(sizeof(match_entry));
+    match_entry * entry = z_malloc(sizeof(match_entry));
     if(!entry)
         return NULL;
     entry->vars = str_array_create(3);
@@ -30,5 +30,5 @@ void match_entry_free(match_entry * entry) {
     if (entry->vars) {
         str_array_free(entry->vars);
     }
-    zfree(entry);
+    z_free(entry);
 }
